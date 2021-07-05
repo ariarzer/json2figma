@@ -30,7 +30,6 @@ figma.ui.onmessage = msg => {
             Object.keys(msg.scheme[schemeName].colors).forEach((colorName) => {
                 const color_identifier = msg.scheme[schemeName].colors[colorName].color_identifier;
                 const colorAhex = msg.palette[color_identifier];
-                console.log(colorAhex);
                 const style = figma.createPaintStyle();
                 const [a, r, g, b] = ahex2rgbaArr(colorAhex);
                 const solidPaint = {
@@ -42,8 +41,18 @@ figma.ui.onmessage = msg => {
                     },
                     opacity: a,
                 };
-                style.name = `${msg.name}_${schemeName}/${colorName}`;
+                style.name = `${msg.name}/${schemeName}/${colorName.split('_').join(' ')}`;
                 style.paints = [solidPaint];
+                const currentComputedStyle = Array.from(figma.getLocalPaintStyles()).find((style) => {
+                    return style.description.includes(colorName);
+                });
+                if (currentComputedStyle && currentComputedStyle.description) {
+                    currentComputedStyle.description = `${currentComputedStyle.description}
+${msg.scheme[schemeName].appearance}: ${color_identifier} ${colorAhex}`;
+                } else {
+                    style.description = `${colorName}
+${msg.scheme[schemeName].appearance}: ${color_identifier} ${colorAhex}`;
+                }
             });
         });
     }
