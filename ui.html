@@ -1,0 +1,40 @@
+<h2>Scheme Creator</h2>
+<button id="create-web-palette">Create web palette</button>
+<button id="create-mobile-palette">Create messenger palette</button>
+<button id="create-messenger-palette">Create messenger palette</button>
+<script>
+
+function createButton (id, fetchHref, paletteName, msgType) {
+  document.getElementById(id).addEventListener('click', () => {
+    fetch(fetchHref)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        parent.postMessage({pluginMessage: {type: msgType, palette: data, name: paletteName}}, '*');
+      });
+  });
+}
+
+createButton(
+  'create-web-palette',
+  'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette_web.json',
+  'web_palette',
+  'create-palette'
+);
+
+createButton(
+  'create-mobile-palette',
+  'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette.json',
+  'mobile_palette',
+  'create-palette'
+);
+
+createButton(
+  'create-messenger-palette',
+  'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette_messages.json',
+  'messenger_palette',
+  'create-palette'
+);
+
+</script>
