@@ -25,5 +25,27 @@ figma.ui.onmessage = msg => {
             style.paints = [solidPaint];
         });
     }
+    if (msg.type === 'create-scheme') {
+        Object.keys(msg.scheme).forEach(schemeName => {
+            Object.keys(msg.scheme[schemeName].colors).forEach((colorName) => {
+                const color_identifier = msg.scheme[schemeName].colors[colorName].color_identifier;
+                const colorAhex = msg.palette[color_identifier];
+                console.log(colorAhex);
+                const style = figma.createPaintStyle();
+                const [a, r, g, b] = ahex2rgbaArr(colorAhex);
+                const solidPaint = {
+                    type: "SOLID",
+                    color: {
+                        r: r,
+                        g: g,
+                        b: b
+                    },
+                    opacity: a,
+                };
+                style.name = `${msg.name}_${schemeName}/${colorName}`;
+                style.paints = [solidPaint];
+            });
+        });
+    }
     figma.closePlugin();
 };

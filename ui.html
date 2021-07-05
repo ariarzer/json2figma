@@ -1,40 +1,66 @@
 <h2>Scheme Creator</h2>
+
 <button id="create-web-palette">Create web palette</button>
 <button id="create-mobile-palette">Create messenger palette</button>
 <button id="create-messenger-palette">Create messenger palette</button>
+
+<button id="create-web-scheme">Create web scheme</button>
+
 <script>
 
-function createButton (id, fetchHref, paletteName, msgType) {
+function createPaletteButton (id, paletteUrl, paletteName, msgType, isPalette = true, schemeUrl = '') {
   document.getElementById(id).addEventListener('click', () => {
-    fetch(fetchHref)
+    fetch(paletteUrl)
       .then((response) => {
         return response.json();
       })
-      .then((data) => {
-        parent.postMessage({pluginMessage: {type: msgType, palette: data, name: paletteName}}, '*');
+      .then((palette) => {
+        if (isPalette) {
+          parent.postMessage({pluginMessage: {type: msgType, palette: palette, name: paletteName}}, '*');
+        } else {
+          if (!schemeUrl) {
+            throw new Error('scheme url in hot define');
+          }
+          fetch(schemeUrl)
+            .then((response) => {
+              return response.json();
+            })
+            .then((scheme) => {
+              parent.postMessage({pluginMessage: {type: msgType, palette: palette, name: paletteName, scheme: scheme}}, '*');
+            });
+        }
       });
   });
 }
 
-createButton(
+createPaletteButton(
   'create-web-palette',
   'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette_web.json',
   'web_palette',
   'create-palette'
 );
 
-createButton(
+createPaletteButton(
   'create-mobile-palette',
   'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette.json',
   'mobile_palette',
   'create-palette'
 );
 
-createButton(
+createPaletteButton(
   'create-messenger-palette',
   'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette_messages.json',
   'messenger_palette',
   'create-palette'
+);
+
+createPaletteButton(
+  'create-web-scheme',
+  'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/palette_web.json',
+  'web_scheme',
+  'create-scheme',
+  false,
+  'https://raw.githubusercontent.com/VKCOM/Appearance/master/main.valette/scheme_web.json'
 );
 
 </script>
